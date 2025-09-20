@@ -9,6 +9,8 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
+  setPersistence,
+  browserSessionPersistence,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
@@ -95,6 +97,7 @@ export default function LoginPage() {
     setLoading(true);
     const provider = new GoogleAuthProvider();
     try {
+      await setPersistence(auth, browserSessionPersistence);
       await signInWithPopup(auth, provider);
       // Logic to create user in Firestore if they don't exist would go here
       // But for login, we assume they do.
