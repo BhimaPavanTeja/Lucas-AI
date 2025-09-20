@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Rocket, LogOut, User as UserIcon } from 'lucide-react';
+import Image from 'next/image';
+import { LogOut, User as UserIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -11,22 +12,33 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/use-auth';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 export function Header() {
   const { user } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      toast({
+        title: 'Signed out',
+        description: 'You have been successfully signed out.',
+      });
       router.push('/login');
     } catch (error) {
       console.error('Logout failed:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Logout failed',
+        description: 'There was an error signing you out. Please try again.',
+      });
     }
   };
 
@@ -39,10 +51,16 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-card">
+    <header className="sticky top-0 z-40 w-full border-b bg-card px-4">
       <div className="container flex h-16 items-center justify-between">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <Rocket className="h-7 w-7 text-primary" />
+          <Image 
+            src="/lucas-logo.png" 
+            alt="Lucas AI Logo" 
+            width={28} 
+            height={28} 
+            className="h-7 w-7"
+          />
           <span className="text-xl font-bold">Lucas</span>
         </Link>
         {user && (
@@ -50,7 +68,6 @@ export function Header() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                 <Avatar className="h-10 w-10">
-                  <AvatarImage src={`https://i.pravatar.cc/150?u=${user.uid}`} alt={user.name} />
                   <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                 </Avatar>
               </Button>

@@ -12,7 +12,11 @@ export default function RootPage() {
   useEffect(() => {
     if (!loading) {
       if (user) {
-        router.replace('/dashboard');
+        if (user.isProfileComplete) {
+          router.replace('/dashboard');
+        } else {
+          router.replace('/onboarding');
+        }
       } else {
         router.replace('/login');
       }

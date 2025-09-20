@@ -1,0 +1,33 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "quests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "career",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "level",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "quests",
+      "queryScope": "COLLECTION", 
+      "fields": [
+        {
+          "fieldPath": "career",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "difficulty",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

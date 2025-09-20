@@ -1,44 +1,24 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
-  setPersistence,
-  browserSessionPersistence,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Mail, Rocket } from 'lucide-react';
-import Link from 'next/link';
-
-const formSchema = z.object({
-  email: z.string().email({ message: 'Invalid email address.' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters.' }),
-});
+import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
 
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -71,119 +51,99 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const { user, loading: authLoading } = useAuth();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { email: '', password: '' },
-  });
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
-      router.push('/dashboard');
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Login Failed',
-        description: error.message,
-      });
-    } finally {
-      setLoading(false);
+  // Redirect logged-in users to appropriate page
+  useEffect(() => {
+    if (!authLoading && user) {
+      if (user.isProfileComplete) {
+        router.push('/dashboard');
+      } else {
+        router.push('/onboarding');
+      }
     }
-  }
+  }, [user, authLoading, router]);
 
   async function handleGoogleSignIn() {
     setLoading(true);
     const provider = new GoogleAuthProvider();
     try {
-      await setPersistence(auth, browserSessionPersistence);
       await signInWithPopup(auth, provider);
-      // Logic to create user in Firestore if they don't exist would go here
-      // But for login, we assume they do.
-      router.push('/dashboard');
+      // Redirect logic is handled by useEffect hook above
+      toast({
+        title: 'Welcome!',
+        description: 'Successfully signed in with Google.',
+      });
     } catch (error: any) {
+      let errorMessage = 'An error occurred during Google sign in.';
+      
+      switch (error.code) {
+        case 'auth/popup-closed-by-user':
+          errorMessage = 'Sign in was cancelled.';
+          break;
+        case 'auth/popup-blocked':
+          errorMessage = 'Pop-up was blocked. Please enable pop-ups and try again.';
+          break;
+        default:
+          errorMessage = error.message;
+      }
+      
       toast({
         variant: 'destructive',
         title: 'Google Sign-In Failed',
-        description: error.message,
+        description: errorMessage,
       });
     } finally {
       setLoading(false);
     }
   }
 
+  // Show loading while checking auth state
+  if (authLoading) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </main>
+    );
+  }
+
+  // Don't render login form if user is already authenticated
+  if (user) {
+    return null;
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
       <div className="absolute top-8 left-8 flex items-center gap-2 text-2xl font-bold text-foreground">
-        <Rocket className="h-8 w-8 text-primary" />
+        <Image 
+          src="/lucas-logo.png" 
+          alt="Lucas AI Logo" 
+          width={32} 
+          height={32} 
+          className="h-8 w-8"
+        />
         <span>Lucas</span>
       </div>
       <Card className="w-full max-w-sm shadow-2xl">
-        <CardHeader>
-          <CardTitle className="text-2xl">Welcome Back</CardTitle>
-          <CardDescription>Enter your credentials to access your dashboard.</CardDescription>
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">Welcome to Lucas</CardTitle>
+          <CardDescription>Sign in with Google to get started</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="you@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                <Mail className="mr-2" /> Sign In with Email
-              </Button>
-            </form>
-          </Form>
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
-            </div>
-          </div>
-          <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={loading}>
+          <Button 
+            className="w-full" 
+            onClick={handleGoogleSignIn} 
+            disabled={loading}
+            size="lg"
+          >
             {loading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               <GoogleIcon className="mr-2" />
             )}
-            Google
+            Continue with Google
           </Button>
         </CardContent>
-        <CardFooter>
-          <p className="w-full text-center text-sm text-muted-foreground">
-            Don't have an account?{' '}
-            <Link href="/signup" className="font-semibold text-primary hover:underline">
-              Sign Up
-            </Link>
-          </p>
-        </CardFooter>
       </Card>
     </main>
   );

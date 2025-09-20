@@ -10,9 +10,11 @@ import PersonalizedGoals from './personalized-goals';
 interface QuestsListProps {
   quests: Quest[];
   user: User;
+  onQuestComplete?: () => void; // Callback to refresh quest data
 }
 
-export default function QuestsList({ quests, user }: QuestsListProps) {
+export default function QuestsList({ quests, user, onQuestComplete }: QuestsListProps) {
+  // Quests are already filtered for completed ones in the fetchQuests function
   const dailyQuests = quests.filter((q) => q.type === 'daily');
   const weeklyQuests = quests.filter((q) => q.type === 'weekly');
 
@@ -40,7 +42,14 @@ export default function QuestsList({ quests, user }: QuestsListProps) {
           <TabsContent value="daily" className="mt-4">
             <div className="space-y-4">
               {dailyQuests.length > 0 ? (
-                dailyQuests.map((quest) => <QuestItem key={quest.id} quest={quest} userId={user.uid} />)
+                dailyQuests.map((quest) => (
+                  <QuestItem 
+                    key={quest.id} 
+                    quest={quest} 
+                    userId={user.uid} 
+                    onComplete={onQuestComplete}
+                  />
+                ))
               ) : (
                 <p className="pt-8 text-center text-sm text-muted-foreground">No daily quests today. Enjoy your day!</p>
               )}
@@ -49,7 +58,14 @@ export default function QuestsList({ quests, user }: QuestsListProps) {
           <TabsContent value="weekly" className="mt-4">
             <div className="space-y-4">
               {weeklyQuests.length > 0 ? (
-                weeklyQuests.map((quest) => <QuestItem key={quest.id} quest={quest} userId={user.uid} />)
+                weeklyQuests.map((quest) => (
+                  <QuestItem 
+                    key={quest.id} 
+                    quest={quest} 
+                    userId={user.uid} 
+                    onComplete={onQuestComplete}
+                  />
+                ))
               ) : (
                 <p className="pt-8 text-center text-sm text-muted-foreground">No weekly quests available. Check back soon!</p>
               )}

@@ -2,39 +2,23 @@
 
 import type { User } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { User as UserIcon } from 'lucide-react';
 
 interface UserProfileProps {
   user: User;
 }
 
 export default function UserProfile({ user }: UserProfileProps) {
-  const xpForNextLevel = 1000;
+  const xpForNextLevel = 300; // Changed from 1000 to 300 XP per level
   const currentLevelXp = user.xp % xpForNextLevel;
   const progressPercentage = (currentLevelXp / xpForNextLevel) * 100;
 
-  const getInitials = (name: string) => {
-    const names = name.split(' ');
-    if (names.length > 1) {
-      return `${names[0][0]}${names[names.length - 1][0]}`;
-    }
-    return name.substring(0, 2);
-  };
-
   return (
     <Card className="shadow-lg">
-      <CardHeader className="flex flex-row items-center gap-4">
-        <Avatar className="h-16 w-16 border-2 border-primary">
-          <AvatarImage src={`https://i.pravatar.cc/150?u=${user.uid}`} alt={user.name} />
-          <AvatarFallback className="text-xl">{getInitials(user.name)}</AvatarFallback>
-        </Avatar>
-        <div>
-          <CardTitle className="text-2xl">{user.name}</CardTitle>
-          <CardDescription>{user.career}</CardDescription>
-        </div>
+      <CardHeader>
+        <CardTitle className="text-2xl">{user.name}</CardTitle>
+        <CardDescription>{user.career}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
