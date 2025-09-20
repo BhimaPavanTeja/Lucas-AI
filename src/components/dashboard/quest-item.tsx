@@ -80,45 +80,45 @@ export default function QuestItem({ quest, userId, onComplete }: QuestItemProps)
 
   return (
     <Card className="bg-secondary/50 transition-shadow hover:shadow-md">
-      <div className="flex items-center p-4">
-        <div className="flex-1 space-y-2">
-          <div className="flex items-center gap-2">
-            <CardTitle className="text-base font-semibold">{quest.questTitle}</CardTitle>
-            <Badge variant={quest.type === 'daily' ? 'default' : 'secondary'} className="text-xs">
-              {quest.type === 'daily' ? (
-                <>
-                  <Clock className="mr-1 h-3 w-3" />
-                  Daily
-                </>
-              ) : (
-                <>
-                  <Calendar className="mr-1 h-3 w-3" />
-                  Weekly
-                </>
-              )}
-            </Badge>
-            {quest.difficulty && (
-              <Badge variant="outline" className="text-xs capitalize">
-                {quest.difficulty}
-              </Badge>
-            )}
-          </div>
-          <CardDescription className="text-sm">{quest.questDesc}</CardDescription>
+      <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
+      <div className="flex-1 space-y-2">
+        <div className="flex flex-wrap items-center gap-2">
+        <CardTitle className="text-base font-semibold">{quest.questTitle}</CardTitle>
+        <Badge variant={quest.type === 'daily' ? 'default' : 'secondary'} className="text-xs">
+          {quest.type === 'daily' ? (
+          <>
+            <Clock className="mr-1 h-3 w-3" />
+            Daily
+          </>
+          ) : (
+          <>
+            <Calendar className="mr-1 h-3 w-3" />
+            Weekly
+          </>
+          )}
+        </Badge>
+        {quest.difficulty && (
+          <Badge variant="outline" className="text-xs capitalize">
+          {quest.difficulty}
+          </Badge>
+        )}
         </div>
-        <div className="ml-4 flex flex-col items-center justify-center space-y-2 text-center">
-          <div className="flex items-center font-bold text-primary">
-            <Award className="mr-1 h-5 w-5" />
-            <span>{quest.xpReward} XP</span>
-          </div>
-          <Button size="sm" onClick={handleComplete} disabled={loading}>
-            {loading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Check className="mr-2 h-4 w-4" />
-            )}
-            Complete
-          </Button>
+        <CardDescription className="text-sm">{quest.questDesc}</CardDescription>
+      </div>
+      <div className="flex flex-row sm:flex-col items-center justify-center gap-2 sm:ml-4 text-center mt-4 sm:mt-0">
+        <div className="flex items-center font-bold text-primary">
+        <Award className="mr-1 h-5 w-5" />
+        <span>{quest.xpReward} XP</span>
         </div>
+        <Button size="sm" onClick={handleComplete} disabled={loading} className="w-full sm:w-auto">
+        {loading ? (
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        ) : (
+          <Check className="mr-2 h-4 w-4" />
+        )}
+        Complete
+        </Button>
+      </div>
       </div>
     </Card>
   );
