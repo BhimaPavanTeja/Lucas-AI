@@ -29,7 +29,7 @@ interface OnboardingData {
 }
 
 export default function OnboardingFlow() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<OnboardingStep>('welcome');
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({});
@@ -77,6 +77,9 @@ export default function OnboardingFlow() {
         experience: updatedData.personalDetails?.experience,
       });
 
+      // Refresh user data in auth context to ensure isProfileComplete is updated
+      await refreshUser();
+
       setCurrentStep('complete');
       
       // Automatically redirect to dashboard after a short delay
@@ -90,7 +93,9 @@ export default function OnboardingFlow() {
     }
   };
 
-  const handleCompleteOnboarding = () => {
+  const handleCompleteOnboarding = async () => {
+    // Ensure user data is refreshed before redirecting
+    await refreshUser();
     router.push('/dashboard');
   };
 
