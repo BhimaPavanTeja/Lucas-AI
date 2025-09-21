@@ -115,19 +115,19 @@ export function Header() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/career-advisor" className="flex items-center">
+                <Link href="/career-advisor" className="flex items-center md:hidden">
                   <MessageSquare className="mr-2 h-4 w-4" />
                   <span>Career Advisor</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/roadmap" className="flex items-center">
+                <Link href="/roadmap" className="flex items-center md:hidden">
                   <Map className="mr-2 h-4 w-4" />
                   <span>Career Roadmap</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/job-insights" className="flex items-center">
+                <Link href="/job-insights" className="flex items-center md:hidden">
                   <TrendingUp className="mr-2 h-4 w-4" />
                   <span>Job Insights</span>
                 </Link>
