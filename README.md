@@ -2,8 +2,6 @@
 
 > **Lucas AI** is a gamified, AI-powered mentor that helps users level up their careers and skills through personalized roadmaps, project-based learning, and real-world job insights. Think: tailored learning + quests + job market intel = growth that actually matters.
 
----
-
 ## Why Lucas?
 Because most learning platforms teach **stuff** — Lucas helps users *become* capable professionals. It's personalized, gamified, and pragmatic: small daily wins, projects that map to real jobs, and advice rooted in current hiring needs.
 
@@ -62,7 +60,7 @@ Lucas provides AI-powered, personalized job-market signals so users know *what t
 > These insights should be surfaced in the dashboard, career pages, and at the end of career roadmaps as "Market Notes".
 
 
-## Tech stack & architecture (suggested)
+## Tech stack & architecture
 - **Frontend:** Next.js TypeScript  
 - **Backend:** Node.js + TypeScript  
 - **DB:** Firebase Database
