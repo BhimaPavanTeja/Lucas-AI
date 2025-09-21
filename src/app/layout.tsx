@@ -6,6 +6,16 @@ import { Toaster } from '@/components/ui/toaster';
 export const metadata: Metadata = {
   title: 'Lucas',
   description: 'Your personal career growth system.',
+  icons: {
+    icon: [
+      { url: '/lucas-logo.png', sizes: '16x16', type: 'image/png' },
+      { url: '/lucas-logo.png', sizes: '32x32', type: 'image/png' },
+      { url: '/lucas-logo.png', sizes: 'any' }
+    ],
+    apple: [
+      { url: '/lucas-logo.png', sizes: '180x180', type: 'image/png' }
+    ]
+  }
 };
 
 export default function RootLayout({
