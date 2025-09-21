@@ -120,9 +120,12 @@ export default function LoginPage() {
           alt="Lucas AI Logo" 
           width={32} 
           height={32} 
-          className="h-8 w-8"
+          className="h-14 w-14"
         />
-        <span>Lucas</span>
+        <div className='flex flex-col'>
+          <span>Lucas</span>
+          <p className='text-sm text-muted-foreground'>AI Career & Skills Advisor</p>
+        </div>
       </div>
       <Card className="w-full max-w-sm shadow-2xl">
         <CardHeader className="text-center">
