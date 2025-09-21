@@ -124,7 +124,7 @@ export default function LoginPage() {
         />
         <div className='flex flex-col'>
           <span>Lucas</span>
-          <p className='text-sm text-muted-foreground'>AI Career & Skills Advisor</p>
+          <p className='text-sm text-muted-foreground'>Personalized Career & Skills Advisor</p>
         </div>
       </div>
       <Card className="w-full max-w-sm shadow-2xl">
