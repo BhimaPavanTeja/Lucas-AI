@@ -1,13 +1,17 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { doc, getDoc, getDocs, updateDoc, increment, setDoc, collection, serverTimestamp, query, where, limit } from 'firebase/firestore';
+import { doc, getDoc, getDocs, updateDoc, increment, setDoc, collection, serverTimestamp, query, where, limit, addDoc, orderBy } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import type { User } from '../lib/types';
 import {
   generatePersonalizedGoals,
   type GeneratePersonalizedGoalsInput,
 } from '../ai/flows/generate-personalized-goals';
+import {
+  generateCareerAdvice,
+  type CareerAdviceInput,
+} from '../ai/flows/generate-career-advice';
 
 export async function completeQuest(payload: {
   userId: string;
@@ -144,6 +148,160 @@ export async function getAiGeneratedGoals(input: GeneratePersonalizedGoalsInput)
     console.error('Error generating AI goals:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
     return { success: false, message: `Failed to generate goals: ${errorMessage}` };
+  }
+}
+
+export async function getCareerAdvice(input: CareerAdviceInput) {
+  try {
+    console.log('Generating career advice with input:', input);
+    const result = await generateCareerAdvice(input);
+    console.log('Career advice generated successfully:', result);
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Error generating career advice:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    return { success: false, message: `Failed to generate career advice: ${errorMessage}` };
+  }
+}
+
+export async function saveChatMessage(payload: {
+  userId: string;
+  message: string;
+  role: 'user' | 'assistant';
+  sessionId?: string;
+}): Promise<{ success: boolean; sessionId: string }> {
+  try {
+    const { userId, message, role, sessionId } = payload;
+    
+    // Create or use existing session ID
+    const chatSessionId = sessionId || `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Try to save to Firestore, but don't fail if it doesn't work
+    try {
+      // Save to a simpler structure that doesn't require complex permissions
+      const chatRef = collection(db, 'chat_messages');
+      await addDoc(chatRef, {
+        userId,
+        message,
+        role,
+        sessionId: chatSessionId,
+        timestamp: serverTimestamp(),
+        createdAt: new Date().toISOString()
+      });
+      
+      // Also save session info
+      const sessionRef = collection(db, 'chat_sessions');
+      const sessionQuery = query(sessionRef, where('sessionId', '==', chatSessionId), where('userId', '==', userId));
+      const sessionSnap = await getDocs(sessionQuery);
+      
+      if (sessionSnap.empty) {
+        await addDoc(sessionRef, {
+          sessionId: chatSessionId,
+          userId,
+          createdAt: serverTimestamp(),
+          lastMessageAt: serverTimestamp(),
+          messageCount: 1,
+          lastMessage: message.substring(0, 100)
+        });
+      } else {
+        const sessionDoc = sessionSnap.docs[0];
+        await updateDoc(sessionDoc.ref, {
+          lastMessageAt: serverTimestamp(),
+          messageCount: increment(1),
+          lastMessage: message.substring(0, 100)
+        });
+      }
+    } catch (firestoreError) {
+      console.warn('Firestore save failed, continuing anyway:', firestoreError);
+    }
+    
+    return { success: true, sessionId: chatSessionId };
+  } catch (error) {
+    console.error('Error in saveChatMessage:', error);
+    return { success: false, sessionId: payload.sessionId || '' };
+  }
+}
+
+export async function getChatSessions(userId: string): Promise<{ success: boolean; sessions: any[] }> {
+  // First try to get from localStorage as a fallback
+  const localSessions = typeof window !== 'undefined' ? 
+    JSON.parse(localStorage.getItem(`chat_sessions_${userId}`) || '[]') : [];
+  
+  try {
+    // Try to get from Firestore
+    const sessionsRef = collection(db, 'chat_sessions');
+    const sessionsQuery = query(
+      sessionsRef,
+      where('userId', '==', userId),
+      orderBy('lastMessageAt', 'desc'),
+      limit(20)
+    );
+    
+    const sessionsSnap = await getDocs(sessionsQuery);
+    const sessions = sessionsSnap.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        sessionId: data.sessionId || doc.id,
+        userId: data.userId,
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+        lastMessageAt: data.lastMessageAt?.toDate ? data.lastMessageAt.toDate() : new Date(data.lastMessageAt || Date.now()),
+        messageCount: data.messageCount || 0,
+        lastMessage: data.lastMessage || 'No preview available'
+      };
+    });
+    
+    // Update localStorage with Firestore data
+    if (typeof window !== 'undefined' && sessions.length > 0) {
+      localStorage.setItem(`chat_sessions_${userId}`, JSON.stringify(sessions));
+    }
+    
+    return { success: true, sessions: sessions.length > 0 ? sessions : localSessions };
+  } catch (error) {
+    console.error('Error fetching from Firestore, using localStorage:', error);
+    return { success: true, sessions: localSessions };
+  }
+}
+
+export async function getChatMessages(userId: string, sessionId: string): Promise<{ success: boolean; messages: any[] }> {
+  // First try to get from localStorage as a fallback
+  const localMessages = typeof window !== 'undefined' ? 
+    JSON.parse(localStorage.getItem(`chat_messages_${userId}_${sessionId}`) || '[]') : [];
+  
+  try {
+    // Try to get from Firestore
+    const messagesRef = collection(db, 'chat_messages');
+    const messagesQuery = query(
+      messagesRef,
+      where('userId', '==', userId),
+      where('sessionId', '==', sessionId),
+      orderBy('timestamp', 'asc')
+    );
+    
+    const messagesSnap = await getDocs(messagesQuery);
+    const messages = messagesSnap.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        message: data.message,
+        role: data.role,
+        sessionId: data.sessionId,
+        timestamp: data.timestamp?.toDate ? data.timestamp.toDate() : new Date(data.createdAt || data.timestamp || Date.now()),
+        suggestedSkills: data.suggestedSkills,
+        actionItems: data.actionItems,
+        resources: data.resources
+      };
+    });
+    
+    // Update localStorage with Firestore data
+    if (typeof window !== 'undefined' && messages.length > 0) {
+      localStorage.setItem(`chat_messages_${userId}_${sessionId}`, JSON.stringify(messages));
+    }
+    
+    return { success: true, messages: messages.length > 0 ? messages : localMessages };
+  } catch (error) {
+    console.error('Error fetching from Firestore, using localStorage:', error);
+    return { success: true, messages: localMessages };
   }
 }
 

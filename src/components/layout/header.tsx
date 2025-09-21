@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { LogOut, User as UserIcon } from 'lucide-react';
+import { LogOut, User as UserIcon, Map, Home, MessageSquare, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -53,16 +53,44 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-card px-4">
       <div className="container flex h-16 items-center justify-between">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <Image 
-            src="/lucas-logo.png" 
-            alt="Lucas AI Logo" 
-            width={28} 
-            height={28} 
-            className="h-7 w-7"
-          />
-          <span className="text-xl font-bold">Lucas</span>
-        </Link>
+        <div className="flex items-center gap-8">
+          <Link href="/dashboard" className="flex items-center gap-2">
+            <Image 
+              src="/lucas-logo.png" 
+              alt="Lucas AI Logo" 
+              width={28} 
+              height={28} 
+              className="h-7 w-7"
+            />
+            <span className="text-xl font-bold">Lucas</span>
+          </Link>
+          
+          {user && (
+            <nav className="hidden md:flex items-center gap-6">
+              <Link 
+                href="/career-advisor" 
+                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <MessageSquare className="h-4 w-4" />
+                Career Advisor
+              </Link>
+              <Link 
+                href="/roadmap" 
+                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Map className="h-4 w-4" />
+                Career Roadmap
+              </Link>
+              <Link 
+                href="/job-insights" 
+                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <TrendingUp className="h-4 w-4" />
+                Job Insights
+              </Link>
+            </nav>
+          )}
+        </div>
         {user && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -79,6 +107,31 @@ export function Header() {
                   <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
                 </div>
               </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard" className="flex items-center">
+                  <Home className="mr-2 h-4 w-4" />
+                  <span>Dashboard</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/career-advisor" className="flex items-center">
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  <span>Career Advisor</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/roadmap" className="flex items-center">
+                  <Map className="mr-2 h-4 w-4" />
+                  <span>Career Roadmap</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/job-insights" className="flex items-center">
+                  <TrendingUp className="mr-2 h-4 w-4" />
+                  <span>Job Insights</span>
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />

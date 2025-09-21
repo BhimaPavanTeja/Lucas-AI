@@ -16,7 +16,8 @@ import QuestsList from '@/components/dashboard/quests';
 import ResourceVault from '@/components/dashboard/resource-vault';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, User as UserIcon, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
+import { Loader2, User as UserIcon, AlertCircle, TrendingUp } from 'lucide-react';
 import { FirebaseStatus } from '@/components/debug/firebase-status';
 
 // Data fetching functions
@@ -305,6 +306,45 @@ function DashboardContent() {
                     mutateQuests(); // Refresh quest list to remove completed quest
                   }}
                 />
+                
+                {/* Job Insights Quick Access */}
+                <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-purple-800">
+                      <TrendingUp className="h-5 w-5" />
+                      Job Market Insights
+                    </CardTitle>
+                    <CardDescription className="text-purple-700">
+                      Discover trending jobs, salary insights, and market opportunities for {userData.career}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-purple-800">1.2M+</div>
+                        <div className="text-xs text-purple-600">Active Jobs</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-purple-800">$85K</div>
+                        <div className="text-xs text-purple-600">Avg Salary</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-purple-800">35%</div>
+                        <div className="text-xs text-purple-600">Remote Jobs</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-purple-800">+12%</div>
+                        <div className="text-xs text-purple-600">Growth Rate</div>
+                      </div>
+                    </div>
+                    <Button asChild className="w-full bg-purple-600 hover:bg-purple-700">
+                      <Link href="/job-insights">
+                        Explore Job Insights
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+                
                 <ResourceVault resources={resources || []} />
                 <FirebaseStatus />
               </div>

@@ -2,30 +2,54 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Users can read and write their own user document
+    // Allow authenticated users to read and write their own user document
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Allow access to user's chat sessions subcollection
+      match /chatSessions/{sessionId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // Allow access to user's chat messages subcollection
+      match /chatMessages/{messageId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+    
+    // Allow authenticated users full access to chat collections
+    match /chat_sessions/{sessionId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    match /chat_messages/{messageId} {
+      allow read, write: if request.auth != null;
     }
     
     // Allow authenticated users to read roadmaps, quests, and resources
     match /roadmaps/{roadmapId} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null; // Allow writing for data seeding
+      allow write: if request.auth != null;
     }
     
     match /quests/{questId} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null; // Allow writing for data seeding
+      allow write: if request.auth != null;
     }
     
     match /resources/{resourceId} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null; // Allow writing for data seeding
+      allow write: if request.auth != null;
     }
     
-    // Quest completions - allow authenticated users to read/write any completion for now
-    // We'll validate ownership in the application logic
+    // Quest completions
     match /questCompletions/{completionId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Allow authenticated users to read/write any document for development
+    // Remove this in production
+    match /{document=**} {
       allow read, write: if request.auth != null;
     }
   }
