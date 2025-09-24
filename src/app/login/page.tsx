@@ -113,40 +113,47 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-      <div className="absolute top-8 left-8 flex items-center gap-2 text-2xl font-bold text-foreground">
-        <Image 
-          src="/lucas-logo.png" 
-          alt="Lucas AI Logo" 
-          width={32} 
-          height={32} 
-          className="h-14 w-14"
-        />
-        <div className='flex flex-col'>
-          <span>Lucas</span>
-          <p className='text-sm text-muted-foreground'>Personalized Career & Skills Advisor</p>
-        </div>
+    <main
+      className="flex min-h-screen flex-col items-center justify-center bg-background p-4"
+      style={{
+      backgroundImage: "url('/image.png')",
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      }}
+    >
+      <div className="absolute top-4 left-4 flex items-center gap-2 text-2xl font-bold text-foreground">
+      <Image 
+        src="/lucas-logo.png" 
+        alt="Lucas AI Logo" 
+        width={32} 
+        height={32} 
+        className="h-14 w-14"
+      />
+      <div className='flex flex-col'>
+        <span className='text-white'>Lucas</span>
+        <p className='text-sm text-muted-foreground'>Personalized Career & Skills Advisor</p>
+      </div>
       </div>
       <Card className="w-full max-w-sm shadow-2xl">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Welcome to Lucas</CardTitle>
-          <CardDescription>Sign in with Google to get started</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <Button 
-            className="w-full" 
-            onClick={handleGoogleSignIn} 
-            disabled={loading}
-            size="lg"
-          >
-            {loading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <GoogleIcon className="mr-2" />
-            )}
-            Continue with Google
-          </Button>
-        </CardContent>
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl">Welcome to Lucas</CardTitle>
+        <CardDescription>Sign in to begin your personalized career journey.</CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-4">
+        <Button 
+        className="w-full bg-black" 
+        onClick={handleGoogleSignIn} 
+        disabled={loading}
+        size="lg"
+        >
+        {loading ? (
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        ) : (
+          <GoogleIcon className="mr-2" />
+        )}
+        Continue with Google
+        </Button>
+      </CardContent>
       </Card>
     </main>
   );
