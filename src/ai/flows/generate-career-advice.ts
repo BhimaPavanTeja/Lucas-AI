@@ -73,11 +73,11 @@ Be specific, practical, and encouraging. Focus on actionable advice that can hel
 Respond in a conversational, helpful tone as if you're a knowledgeable mentor.`;
 
     const response = await ai.generate({
-      model: 'googleai/gemini-2.0-flash-exp',
+      model: 'googleai/gemini-2.5-flash',
       prompt,
       config: {
         temperature: 0.7,
-        maxOutputTokens: 1000
+        maxOutputTokens: 2000
       }
     });
     
