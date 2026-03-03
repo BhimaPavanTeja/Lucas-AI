@@ -88,6 +88,13 @@ export function Header() {
                 <TrendingUp className="h-4 w-4" />
                 Job Insights
               </Link>
+              <Link
+                href="/ai-character"
+                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <UserIcon className="h-4 w-4" />
+                AI Character
+              </Link>
             </nav>
           )}
         </div>
@@ -136,6 +143,12 @@ export function Header() {
                 <Link href="https://ai-careers-advisor.netlify.app/" className="flex items-center">
                   <TrendingUp className="mr-2 h-4 w-4" />
                   <span>Career Match</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/ai-character" className="flex items-center md:hidden">
+                  <UserIcon className="mr-2 h-4 w-4" />
+                  <span>AI Character</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
