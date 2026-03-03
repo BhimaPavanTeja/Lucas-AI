@@ -132,6 +132,12 @@ export function Header() {
                   <span>Job Insights</span>
                 </Link>
               </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="https://ai-careers-advisor.netlify.app/" className="flex items-center">
+                  <TrendingUp className="mr-2 h-4 w-4" />
+                  <span>Career Match</span>
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
